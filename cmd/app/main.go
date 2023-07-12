@@ -8,12 +8,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"test-ci-cd/cmd/config"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func setup() {
+func setup(cfg *config.Config) {
 	g := gin.Default()
 	server := &http.Server{
 		ReadTimeout:       2 * time.Second,
@@ -24,7 +25,7 @@ func setup() {
 	}
 
 	go func() {
-		log.Printf("listening at port %d", 8080)
+		log.Printf("listening at port %d", cfg.GetConfig().GetServerConfig().Port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s", err)
 		}
@@ -40,7 +41,7 @@ func setup() {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		log.Print("Server Shutdown:", err)
 	}
 	// catching ctx.Done(). timeout of 1 seconds.
 	<-ctx.Done()
@@ -49,5 +50,6 @@ func setup() {
 }
 
 func main() {
-	setup()
+	cfg := config.InitConfig()
+	setup(cfg)
 }

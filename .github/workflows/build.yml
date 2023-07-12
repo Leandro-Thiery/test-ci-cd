@@ -26,7 +26,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/test-ci-cd:latest
-  
+
   deploy:
     needs: build_image
     runs-on: ubuntu-latest
